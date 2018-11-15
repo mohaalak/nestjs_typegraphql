@@ -21,18 +21,18 @@ export function createResolverDecorator(
   };
 }
 
-export function createPropertyDecorator(
-  propertyName?: string,
-): MethodDecorator {
-  return (target, key?, descriptor?) => {
-    ReflectMetadata(RESOLVER_NAME_METADATA, propertyName)(
-      target,
-      key,
-      descriptor,
-    );
-    ReflectMetadata(RESOLVER_PROPERTY_METADATA, true)(target, key, descriptor);
-  };
-}
+// export function createPropertyDecorator(
+//   propertyName?: string,
+// ): MethodDecorator {
+//   return (target, key?, descriptor?) => {
+//     ReflectMetadata(RESOLVER_NAME_METADATA, propertyName)(
+//       target,
+//       key,
+//       descriptor,
+//     );
+//     ReflectMetadata(RESOLVER_PROPERTY_METADATA, true)(target, key, descriptor);
+//   };
+// }
 
 export function createDelegateDecorator(
   propertyName?: string,
@@ -51,16 +51,10 @@ export function createDelegateDecorator(
   };
 }
 
-export function Scalar(name: string): ClassDecorator {
-  return (target, key?, descriptor?) => {
-    ReflectMetadata(SCALAR_NAME_METADATA, name)(target, key, descriptor);
-  };
-}
-
-export const Query = createResolverDecorator(Resolvers.QUERY);
-export const Mutation = createResolverDecorator(Resolvers.MUTATION);
+// export const Query = createResolverDecorator(Resolvers.QUERY);
+// export const Mutation = createResolverDecorator(Resolvers.MUTATION);
 export const Subscription = createResolverDecorator(Resolvers.SUBSCRIPTION);
-export const Resolver = createResolverDecorator();
+// export const Resolver = createResolverDecorator();
 
-export const ResolveProperty = createPropertyDecorator;
-export const DelegateProperty = createDelegateDecorator;
+// export const ResolveProperty = createPropertyDecorator;
+// export const DelegateProperty = createDelegateDecorator;

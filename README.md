@@ -1,53 +1,110 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
-
-[travis-image]: https://api.travis-ci.org/nestjs/nest.svg?branch=master
-[travis-url]: https://travis-ci.org/nestjs/nest
-[linux-image]: https://img.shields.io/travis/nestjs/nest/master.svg?label=linux
-[linux-url]: https://travis-ci.org/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="blank">Node.js</a> framework for building efficient and scalable server-side applications, heavily inspired by <a href="https://angular.io" target="blank">Angular</a>.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/dm/@nestjs/core.svg" alt="NPM Downloads" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://api.travis-ci.org/nestjs/nest.svg?branch=master" alt="Travis" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://img.shields.io/travis/nestjs/nest/master.svg?label=linux" alt="Linux" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#5" alt="Coverage" /></a>
-<a href="https://gitter.im/nestjs/nestjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge"><img src="https://badges.gitter.im/nestjs/nestjs.svg" alt="Gitter" /></a>
-<a href="https://opencollective.com/nest#backer"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec"><img src="https://img.shields.io/badge/Donate-PayPal-dc3d53.svg"/></a>
-  <a href="https://twitter.com/nestframework"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
 ## Description
 
-This is a [GraphQL (Apollo)](https://www.apollographql.com/) module for [Nest](https://github.com/nestjs/nest).
+This is a [TypeGraphQL](https://github.com/19majkel94/type-graphql) module for [Nest](https://github.com/nestjs/nest).
 
-## Installation
+## How to use
 
-```bash
-$ npm i --save @nestjs/graphql apollo-server-express graphql
+I manually combine both decorators of [Nestjs Graphql](https://github.com/nestjs/graphql) with TypeGraphql.
+idea is that the typegraphql will create the graphql schema but Nestjs will provide the resolvers and other run times.
+
+first install it
+
+```
+npm install nestjs-typegraphql
 ```
 
-## Quick Start
+This module can only build a GraphQLSchema it does not run a graphQL server , you can simply run a graphql server yourself.
+for example for apollo server you can make it this way
 
-[Overview & Tutorial](https://docs.nestjs.com/graphql/quick-start)
+```typescript
+@Module({
+  imports: [TypeGraphQLModule],
+})
+export class ApolloMdoule implements OnModuleInit {
+  apolloServer: ApolloServer;
+  constructor(
+    private readonly appRefHost: ApplicationReferenceHost,
+    private readonly graphQLFactory: SchemaBuilder,
+  ) {}
+  async onModuleInit() {
+    if (!this.appRefHost) {
+      return;
+    }
 
-## Support
+    const httpServer = this.appRefHost.applicationRef;
+    if (!httpServer) {
+      return;
+    }
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+    const app = httpServer.getInstance();
+    const schema = await this.graphQLFactory.build();
 
-## Stay in touch
+    this.apolloServer = new ApolloServer({ schema, playground: true });
+    this.apolloServer.applyMiddleware({
+      app,
+    });
+  }
+}
+```
 
-* Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-* Website - [https://nestjs.com](https://nestjs.com/)
-* Twitter - [@nestframework](https://twitter.com/nestframework)
+## Changes to TypeGraphQL Decorators
 
-## License
+cause the resolvers function is provided by NestJs
+you cannot use
 
-Nest is [MIT licensed](LICENSE).
+- [@Authorized()](https://19majkel94.github.io/type-graphql/docs/authorization.html)
+- [Validation](https://19majkel94.github.io/type-graphql/docs/validation.html)
+- [Middleware and Guards](https://19majkel94.github.io/type-graphql/docs/middlewares.html) from typegraphql
+  but you can use Guard, Interceptors,Pipes from Nestjs.
+- also there is no @Ctx decorator you can use @Context decorator.
+
+## Changes to Nestjs GraphQL
+
+- @Resolver does not accept name anymore
+- @Query and @Mutation does not accept name as a field in decorator but you can pass it in options that you provide to decorator.
+- @ResolveProperty is removed use @FieldResolver
+- @Args does not accept name and it will provide the whole arguments input but you can use @Arg for a named argument
+  also if you want to use pipe in @Args and @Arg you should pass an array of pipes to pieps key in options
+- Also you should read the [typegraphql manual](https://19majkel94.github.io/type-graphql/docs/getting-started.html)
+
+## Scalar Type
+
+for scalar type you can use @Scalar but it does not accept name anymore you should provide it in class but it accept a type funciton like typegraphQL it
+
+```typescript
+@Scalar(type => Date)
+export class DateScalar {
+  description = 'Date custom scalar type';
+
+  parseValue(value) {
+    return new Date(value); // value from the client
+  }
+
+  serialize(value) {
+    return value.getTime(); // value sent to the client
+  }
+
+  parseLiteral(ast) {
+    if (ast.kind === Kind.INT) {
+      return parseInt(ast.value, 10); // ast value is always in string format
+    }
+    return null;
+  }
+}
+```
+
+then you should use provide it in a module so it will be created and for using this scalar in schema you can use type that you provided in decorator so for this scalar we can simply write this input type
+
+```typescript
+@ObjectType()
+class User {
+  @Field()
+  registrationDate: Date;
+}
+```
+
+## Example
+
+## Todos
+
+- @Subsciption decorator is missing and it's cause the NestJS and Typegraphql has 2 types of signature

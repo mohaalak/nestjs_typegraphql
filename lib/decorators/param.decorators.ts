@@ -1,3 +1,5 @@
+// tslint:disable:unified-signatures
+// tslint:disable:trailing-comma
 import { PipeTransform, Type } from '@nestjs/common';
 import { isNil, isString } from '@nestjs/common/utils/shared.utils';
 import 'reflect-metadata';
@@ -12,20 +14,22 @@ export interface ParamsMetadata {
   };
 }
 
-const assignMetadata = (
+export const assignMetadata = (
   args: ParamsMetadata,
   paramtype: GqlParamtype,
   index: number,
   data?: ParamData,
   ...pipes: (Type<PipeTransform> | PipeTransform)[]
-) => ({
-  ...args,
-  [`${paramtype}:${index}`]: {
-    index,
-    data,
-    pipes,
-  },
-});
+) => {
+  return {
+    ...args,
+    [`${paramtype}:${index}`]: {
+      index,
+      data,
+      pipes,
+    },
+  };
+};
 
 const createParamDecorator = (paramtype: GqlParamtype) => {
   return (data?: ParamData): ParameterDecorator => (target, key, index) => {
@@ -64,19 +68,6 @@ export const Root: () => ParameterDecorator = createParamDecorator(
 export const Parent: () => ParameterDecorator = createParamDecorator(
   GqlParamtype.ROOT,
 );
-
-export function Args();
-export function Args(...pipes: (Type<PipeTransform> | PipeTransform)[]);
-export function Args(
-  property: string,
-  ...pipes: (Type<PipeTransform> | PipeTransform)[]
-);
-export function Args(
-  property?: string | (Type<PipeTransform> | PipeTransform),
-  ...pipes: (Type<PipeTransform> | PipeTransform)[]
-) {
-  return createPipesParamDecorator(GqlParamtype.ARGS)(property, ...pipes);
-}
 
 export function Context();
 export function Context(...pipes: (Type<PipeTransform> | PipeTransform)[]);
