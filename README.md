@@ -74,6 +74,7 @@ for scalar type you can use @Scalar but it does not accept name anymore you shou
 ```typescript
 @Scalar(type => Date)
 export class DateScalar {
+  name = 'Date';
   description = 'Date custom scalar type';
 
   parseValue(value) {
@@ -103,7 +104,7 @@ class User {
 }
 ```
 
-## Example
+## See The [Example](https://github.com/mohaalak/nestjs_type_graphql_example)
 
 ## Todos
 

@@ -28,7 +28,7 @@ export function Args(
     const args =
       Reflect.getMetadata(PARAM_ARGS_METADATA, target.constructor, key) || {};
 
-    const paramPipes = pipes.pipes ? pipes.pipes : [];
+    const paramPipes = pipes ? (pipes.pipes ? pipes.pipes : []) : [];
 
     Reflect.defineMetadata(
       PARAM_ARGS_METADATA,

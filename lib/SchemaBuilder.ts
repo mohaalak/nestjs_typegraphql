@@ -20,9 +20,10 @@ export class SchemaBuilder {
     try {
       const scalars = this.scalarsExplorerService.explore();
       const schema = await buildSchema({
+        emitSchemaFile: true,
+        ...options,
         // typegraphql have a validation that cannot send an empty resolvers array or an empty string to it
         resolvers: ['**/*.undfined.undfiend.js'],
-        emitSchemaFile: true,
       });
 
       const resolvers = this.resolversExplorerService.explore();
