@@ -10,7 +10,7 @@ idea is that the typegraphql will create the graphql schema but Nestjs will prov
 first install it
 
 ```
-npm install nestjs-typegraphql
+npm install nest-type-graphql
 ```
 
 This module can only build a GraphQLSchema it does not run a graphQL server , you can simply run a graphql server yourself.
