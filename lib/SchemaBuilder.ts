@@ -24,6 +24,7 @@ export class SchemaBuilder {
         ...options,
         // typegraphql have a validation that cannot send an empty resolvers array or an empty string to it
         resolvers: ['**/*.undfined.undfiend.js'],
+        scalarsMap: scalars,
       });
 
       const resolvers = this.resolversExplorerService.explore();
