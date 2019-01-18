@@ -20,7 +20,7 @@ for example for apollo server you can make it this way
 @Module({
   imports: [TypeGraphQLModule],
 })
-export class ApolloMdoule implements OnModuleInit {
+export class ApolloModule implements OnModuleInit {
   apolloServer: ApolloServer;
   constructor(
     private readonly appRefHost: ApplicationReferenceHost,
